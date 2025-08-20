@@ -3,22 +3,19 @@ import puppeteer from 'puppeteer';
 
 const DATA_FILE = './data/matches.json';
 
-// Read cached matches
 function readCache() {
   try {
     const data = fs.readFileSync(DATA_FILE, 'utf-8');
     return JSON.parse(data);
-  } catch (e) {
+  } catch {
     return [];
   }
 }
 
-// Save cache
 function saveCache(matches) {
   fs.writeFileSync(DATA_FILE, JSON.stringify(matches, null, 2));
 }
 
-// Merge old and new matches (avoid duplicates & update scores/status)
 function mergeMatches(oldMatches, newMatches) {
   const map = new Map();
   oldMatches.forEach(m => map.set(m.id, m));
@@ -37,19 +34,23 @@ function mergeMatches(oldMatches, newMatches) {
   return Array.from(map.values());
 }
 
-// Fetch matches for a given date using Puppeteer
 async function fetchMatchesForDate(date) {
-  const url = `https://api.sofascore.com/api/v1/sport/football/scheduled-events/${date}`;
   let browser;
   try {
     browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
+    // Sofascore API fetch inside a real browser
     const data = await page.evaluate(async (url) => {
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': navigator.userAgent,
+          'Accept': 'application/json',
+        },
+      });
       if (!res.ok) throw new Error('Failed to fetch API');
       return res.json();
-    }, url);
+    }, `https://api.sofascore.com/api/v1/sport/football/scheduled-events/${date}`);
 
     await browser.close();
     return data.events || [];
@@ -60,17 +61,15 @@ async function fetchMatchesForDate(date) {
   }
 }
 
-// Main function
 async function main() {
   const oldMatches = readCache();
-
   const today = new Date();
   const matchesToFetch = [];
-  // CHANGE 3 for testing, later use 30 for full cron job
+
   for (let i = 0; i < 30; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() + i);
-    const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+    const dateStr = d.toISOString().split('T')[0];
     matchesToFetch.push(dateStr);
   }
 
