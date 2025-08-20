@@ -26,4 +26,4 @@ jobs:
 
       # 4. Run your script
       - name: Run fetch script
-        run: node yourScript.js
+        run: node scraper.js
