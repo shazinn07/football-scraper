@@ -1,29 +1,18 @@
-name: Fetch Matches Cron
+name: Football Scraper
 
-# Runs every 30 minutes
 on:
   schedule:
-    - cron: '*/30 * * * *'
-  workflow_dispatch:  # allows manual trigger
+    - cron: '*/30 * * * *' # every 30 minutes
+  workflow_dispatch: # manual trigger
 
 jobs:
-  fetch-matches:
+  scrape:
     runs-on: ubuntu-latest
-
     steps:
-      # 1. Checkout the repo
       - uses: actions/checkout@v3
-
-      # 2. Set up Node.js
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: '20'
+      - run: npm install
+      - run: node scraper.js
 
-      # 3. Install dependencies
-      - name: Install dependencies
-        run: npm install
-
-      # 4. Run your script
-      - name: Run fetch script
-        run: node scraper.js

@@ -1,5 +1,5 @@
 import fs from 'fs';
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
 
 const DATA_FILE = './data/matches.json';
 
@@ -37,7 +37,11 @@ function mergeMatches(oldMatches, newMatches) {
 async function fetchMatchesForDate(date) {
   let browser;
   try {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({ 
+      headless: true,
+      executablePath: '/usr/bin/google-chrome-stable',
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
 
     // Sofascore API fetch inside a real browser
@@ -60,6 +64,7 @@ async function fetchMatchesForDate(date) {
     return [];
   }
 }
+
 
 async function main() {
   const oldMatches = readCache();
