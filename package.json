@@ -1,0 +1,21 @@
+{
+  "name": "football-schedules",
+  "version": "1.0.0",
+  "description": "Scraper for football schedules",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "chrome-aws-lambda": "^10.1.0",
+    "express": "^4.19.2",
+    "node-fetch": "^3.3.2",
+    "puppeteer": "^24.16.2",
+    "puppeteer-core": "^10.4.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
